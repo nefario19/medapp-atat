@@ -20,13 +20,11 @@ Future<void> main() async {
   String supabaseUrl;
   String supabaseAnonKey;
 
-  // Probeer eerst omgevingsvariabelen te lezen die via --dart-define zijn ingesteld (bijv. in CI/CD)
-  // De waarden zijn leeg als ze niet zijn ingesteld, vandaar de isEmpty check.
   const String definedUrl = String.fromEnvironment('SUPABASE_URL');
   const String definedAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 
   if (definedUrl.isNotEmpty && definedAnonKey.isNotEmpty) {
-    // Gebruik de variabelen die tijdens de build zijn ingevoegd (productie)
+    // Gebruik de variabelen die tijdens de build zijn ingevoegd (productie, CI/CD)
     supabaseUrl = definedUrl;
     supabaseAnonKey = definedAnonKey;
   } else {
@@ -44,7 +42,6 @@ Future<void> main() async {
     }
   }
 
-  // Initialiseer Supabase met de gevonden URL en Anon Key
   await Supabase.initialize(
     url: supabaseUrl,
     anonKey: supabaseAnonKey,
