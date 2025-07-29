@@ -85,7 +85,7 @@ class AcceptanceTesterApp extends StatelessWidget {
           centerTitle: true,
           systemOverlayStyle: SystemUiOverlayStyle.dark,
         ),
-        cardTheme: CardThemeData(
+        cardTheme: CardTheme(
           elevation: 2,
           shadowColor: Colors.black.withOpacity(0.1),
           shape: const RoundedRectangleBorder(
