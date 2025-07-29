@@ -32,4 +32,4 @@ flutter:
   uses-material-design: true
 
   assets:
-    - Google Symbol.png
+    - google_symbol.png
