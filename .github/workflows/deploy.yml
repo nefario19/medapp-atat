@@ -1,0 +1,51 @@
+name: Deploy Flutter Web to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # De branch waar je wijzigingen naartoe pusht (bijv. main of master)
+  workflow_dispatch: # Maakt het mogelijk om de workflow handmatig te starten
+
+permissions:
+  contents: write # Nodig om de build-artefacten naar de gh-pages branch te pushen
+  pages: write # Nodig voor deployments naar GitHub Pages
+  id-token: write # Nodig voor OIDC authenticatie met GitHub Pages
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest # De omgeving waarop de workflow draait
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          # Gebruik hier de exacte Flutter SDK versie die je lokaal gebruikt of de nieuwste stabiele
+          flutter-version: '3.22.x' # Pas dit aan als je een specifiekere versie hebt (bijv. '3.22.0')
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Build Flutter Web App
+        run: |
+          flutter build web --release \
+            --base-href /${{ github.event.repository.name }}/ \
+            --dart-define=SUPABASE_URL="${{ secrets.SUPABASE_URL }}" \
+            --dart-define=SUPABASE_ANON_KEY="${{ secrets.SUPABASE_ANON_KEY }}"
+        # De `--dart-define` vlaggen injecteren de secrets direct in de build.
+        # ${{ secrets.SUPABASE_URL }} haalt de secret op die je eerder hebt aangemaakt.
+        # ${{ github.event.repository.name }} haalt automatisch de naam van je repository op ('acceptance_tester' in jouw geval).
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './build/web' # Dit is de map waar Flutter de web-app bestanden plaatst
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
